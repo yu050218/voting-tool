@@ -790,6 +790,10 @@ td span {
   margin-top: 0;
 }
 
+.form-panel > button {
+  margin-top: 16px;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
