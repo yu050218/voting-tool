@@ -578,7 +578,7 @@ export function 万能投票工具应用() {
   }
 
   function jump(target, taskId = activeTaskId) {
-    if (target === "admin" && !currentUser) {
+    if (target === "admin" && !currentUser && !getSessionId()) {
       setPage("admin-login");
       return;
     }
@@ -1437,28 +1437,26 @@ function 题目对象配置页({ task, updateTask, jump, flash, currentUser }) {
               <label>对象名称<input value={objectDraft.name} onChange={(event) => setObjectDraft({ ...objectDraft, name: event.target.value })} /></label>
               <label>身份 / 作者<input value={objectDraft.meta} onChange={(event) => setObjectDraft({ ...objectDraft, meta: event.target.value })} /></label>
               <label className="wide">简介<textarea rows="3" value={objectDraft.description} onChange={(event) => setObjectDraft({ ...objectDraft, description: event.target.value })} /></label>
-              <div className="upload-row wide">
-                <label className="image-upload-label">
-                  图片
-                  <label className="secondary upload-btn" htmlFor="image-upload">
-                    <Upload size={16} />{objectDraft.image ? objectDraft.image.name : "上传图片"}
-                    <input id="image-upload" type="file" accept="image/*" onChange={handleImageUpload} />
-                  </label>
-                  {objectDraft.image && (
-                    <button type="button" className="text-btn" onClick={() => setObjectDraft({ ...objectDraft, image: null })}>移除</button>
-                  )}
+              <label className="image-upload-label wide">
+                图片
+                <label className="secondary upload-btn" htmlFor="image-upload">
+                  <Upload size={16} />{objectDraft.image ? objectDraft.image.name : "上传图片"}
+                  <input id="image-upload" type="file" accept="image/*" onChange={handleImageUpload} />
                 </label>
-                <label className="attachment-upload-label">
-                  附件
-                  <label className="secondary upload-btn" htmlFor="attachment-upload">
-                    <Upload size={16} />{objectDraft.attachment ? objectDraft.attachment.name : "上传附件"}
-                    <input id="attachment-upload" type="file" onChange={handleAttachmentUpload} />
-                  </label>
-                  {objectDraft.attachment && (
-                    <button type="button" className="text-btn" onClick={() => setObjectDraft({ ...objectDraft, attachment: null })}>移除</button>
-                  )}
+                {objectDraft.image && (
+                  <button type="button" className="text-btn" onClick={() => setObjectDraft({ ...objectDraft, image: null })}>移除</button>
+                )}
+              </label>
+              <label className="attachment-upload-label wide">
+                附件
+                <label className="secondary upload-btn" htmlFor="attachment-upload">
+                  <Upload size={16} />{objectDraft.attachment ? objectDraft.attachment.name : "上传附件"}
+                  <input id="attachment-upload" type="file" onChange={handleAttachmentUpload} />
                 </label>
-              </div>
+                {objectDraft.attachment && (
+                  <button type="button" className="text-btn" onClick={() => setObjectDraft({ ...objectDraft, attachment: null })}>移除</button>
+                )}
+              </label>
               <label className="color-upload-label wide">展示色<input type="color" value={objectDraft.color} onChange={(event) => setObjectDraft({ ...objectDraft, color: event.target.value })} /></label>
             </div>
             <button type="button" onClick={addObject}><Plus size={16} />添加对象</button>
@@ -1466,7 +1464,27 @@ function 题目对象配置页({ task, updateTask, jump, flash, currentUser }) {
           </section>
         </div>
 
-        {task.loginMode !== "none" && (
+        {task.loginMode === "random" && (
+        <section className="account-panel">
+          <div>
+            <h2>任务账号</h2>
+            <p>点击下方按钮生成随机账号，生成后可下载分发。</p>
+          </div>
+          <div className="account-actions">
+            <button className="secondary" type="button" onClick={() => {
+              if (!task.name) return flash("请先设置任务名称。");
+              const count = task.accountCount || 10;
+              const accounts = 生成账号(task.id, task.name, count);
+              updateTask(task.id, (old) => ({ ...old, accounts }));
+              flash(`已生成 ${accounts.length} 个账号。`);
+            }}><RefreshCw size={16} />生成账号</button>
+            <button className="secondary" disabled={!task.accounts?.length} type="button" onClick={() => 导出账号(task)}><Download size={16} />下载账号</button>
+            <button type="button" onClick={publish}>发布任务</button>
+          </div>
+        </section>
+        )}
+
+        {task.loginMode === "assigned" && (
         <section className="account-panel">
           <div>
             <h2>任务账号</h2>
