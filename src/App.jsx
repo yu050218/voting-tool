@@ -466,6 +466,14 @@ export function 万能投票工具应用() {
     });
   }, []);
 
+  useEffect(() => {
+    if (page !== "home") return;
+    const interval = setInterval(() => {
+      apiGetPublicTasks().then((data) => setPublicTasks(data));
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [page]);
+
   const activeTask = tasks.length > 0 ? (tasks.find((task) => task.id === activeTaskId) || tasks[0]) : null;
   const activePublicTask = publicTasks.length > 0 ? (publicTasks.find((task) => task.id === activeTaskId) || publicTasks[0]) : null;
 
@@ -1399,8 +1407,8 @@ function 题目对象配置页({ task, updateTask, jump, flash, currentUser }) {
     event.target.value = '';
   }
 
-  function publish() {
-    updateTask(task.id, (old) => ({ ...old, status: "published" }));
+  async function publish() {
+    await updateTask(task.id, (old) => ({ ...old, status: "published" }));
     apiGetPublicTasks().then((data) => setPublicTasks(data));
     flash("任务已发布，前台首页可见。");
     jump("admin", task.id);
