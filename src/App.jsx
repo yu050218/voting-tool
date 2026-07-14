@@ -537,6 +537,7 @@ export function 万能投票工具应用() {
         remainingTasks = arr.filter((t) => t.id !== taskId);
         return remainingTasks;
       });
+      apiGetPublicTasks().then((data) => setPublicTasks(data));
       if (activeTaskId === taskId) {
         const newId = remainingTasks.length > 0 ? remainingTasks[0].id : null;
         setActiveTaskId(newId);
@@ -954,6 +955,7 @@ function 投票测评页({ task, updateTask, jump, flash }) {
 
     const result = await apiSubmitRecord(task.id, record);
     if (result.success) {
+      apiGetPublicTasks().then((data) => setPublicTasks(data));
       flash("提交成功，感谢参与。");
       jump("home");
     } else {
@@ -1099,6 +1101,7 @@ function 后台任务管理页({ tasks, createTask, updateTask, removeTask, jump
 
   async function changeStatus(taskId, status) {
     await updateTask(taskId, (old) => ({ ...old, status }));
+    apiGetPublicTasks().then((data) => setPublicTasks(data));
     flash(`任务状态已更新为：${状态文本[status]}`);
   }
 
@@ -1398,6 +1401,7 @@ function 题目对象配置页({ task, updateTask, jump, flash, currentUser }) {
 
   function publish() {
     updateTask(task.id, (old) => ({ ...old, status: "published" }));
+    apiGetPublicTasks().then((data) => setPublicTasks(data));
     flash("任务已发布，前台首页可见。");
     jump("admin", task.id);
   }
