@@ -189,14 +189,114 @@ student003,password789
 
 首次启动时会自动初始化管理员账号和示例数据。
 
-## 十、注意事项
+## 十、部署指南
+
+### 本地开发部署
+
+```bash
+# 1. 克隆仓库
+git clone git@github.com:yu050218/voting-tool.git
+cd voting-tool
+
+# 2. 安装前端依赖
+npm install
+
+# 3. 安装后端依赖
+cd server && npm install
+
+# 4. 启动后端服务（端口 5000）
+node app.js
+
+# 5. 启动前端开发服务器（端口 5173）
+cd ..
+npm run dev
+
+# 6. 浏览器访问
+# http://localhost:5173
+```
+
+### 生产环境部署
+
+#### 1. 构建前端
+
+```bash
+npm run build
+```
+
+构建产物在 `dist/` 目录。
+
+#### 2. 配置后端
+
+后端默认端口为 5000，可通过环境变量 `PORT` 修改：
+
+```bash
+PORT=3000 node server/app.js
+```
+
+#### 3. 使用 Nginx 反向代理
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    # 前端静态文件
+    location / {
+        root /path/to/voting-tool/dist;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # API 代理到后端
+    location /api/ {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+#### 4. 使用 PM2 进程管理
+
+```bash
+# 安装 PM2
+npm install -g pm2
+
+# 启动后端服务
+pm2 start server/app.js --name voting-tool
+
+# 查看日志
+pm2 logs voting-tool
+
+# 开机自启
+pm2 startup
+pm2 save
+```
+
+### 数据库说明
+
+数据库文件 `server/voting.db` 不在 GitHub 中，首次启动时会自动创建并初始化：
+
+- 自动创建管理员账号：`admin/admin123`
+- 自动创建示例用户：`teacher/teacher123`
+- 自动创建示例任务数据
+
+部署到新服务器时，无需手动创建数据库文件。
+
+## 十一、注意事项
 
 1. 上传图片大小限制：3MB
 2. 上传附件大小限制：5MB
 3. 任务数据包含图片 base64 编码，数据库文件可能较大
 4. 建议定期备份 `server/voting.db` 文件
+5. 生产环境建议配置 HTTPS（使用 Nginx + Let's Encrypt）
 
-## 十一、已验证命令
+## 十二、已验证命令
 
 ```bash
 npm install
