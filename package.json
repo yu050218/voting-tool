@@ -1,0 +1,23 @@
+{
+  "name": "universal-campus-vote-tool",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
+    "start": "npm run build && npm run preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "lucide-react": "^0.468.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sqlite3": "^6.0.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  }
+}
